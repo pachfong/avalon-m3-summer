@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-AVALON: MISSION CONTROL</title>
+    <title>AI-AVALON: THE VOTE DECISION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -15,8 +15,8 @@
         .btn-neon { border: 1px solid #00ff41; color: #00ff41; transition: 0.3s; cursor: pointer; background: rgba(0,0,0,0.5); }
         .btn-neon:hover:not(:disabled) { background: #00ff41; color: #000; box-shadow: 0 0 15px #00ff41; }
         .btn-neon:disabled { border-color: #333; color: #333; cursor: not-allowed; }
-        .leader-crown { filter: drop-shadow(0 0 5px #fbbf24); }
-        .selected-player { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8 !important; }
+        .vote-card { border: 1px solid #444; padding: 5px; border-radius: 4px; font-size: 10px; text-align: center; }
+        .voted { border-color: #00ff41; color: #00ff41; }
     </style>
 </head>
 <body class="p-4">
@@ -24,45 +24,46 @@
     <div id="app" class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-6 cyber-border p-4 bg-black rounded">
             <div>
-                <h1 class="cyber-font text-lg font-bold">AVALON ONLINE</h1>
-                <p id="game-status" class="text-[10px] text-yellow-500 uppercase tracking-widest">LOADING SYSTEM...</p>
+                <h1 class="cyber-font text-lg font-bold text-neon">AVALON: MISSION 2026</h1>
+                <p id="game-status" class="text-[10px] text-yellow-500 uppercase">SYSTEM READY</p>
             </div>
             <div id="timer-display" class="cyber-font text-xl text-yellow-400">00:00</div>
         </div>
 
         <div id="login-screen" class="cyber-border p-8 rounded bg-zinc-900 text-center">
-            <h2 class="cyber-font mb-4">AGENT IDENTIFICATION</h2>
-            <input type="text" id="username" placeholder="NAME / CODE" class="w-full bg-black border border-zinc-700 p-4 mb-4 text-green-500 text-center focus:border-green-400 outline-none">
-            <button onclick="joinGame()" class="w-full btn-neon py-4 cyber-font font-bold">JOIN MISSION</button>
-            <button onclick="beHost()" class="text-zinc-600 text-[10px] mt-6 block mx-auto underline">OPERATOR (HOST) ACCESS</button>
+            <input type="text" id="username" placeholder="รหัสชื่อของคุณ" class="w-full bg-black border border-zinc-700 p-4 mb-4 text-green-500 text-center outline-none">
+            <button onclick="joinGame()" class="w-full btn-neon py-4 cyber-font font-bold">CONNECT AGENT</button>
+            <button onclick="beHost()" class="text-zinc-600 text-[10px] mt-6 block mx-auto underline">OPERATOR OVERRIDE</button>
         </div>
 
         <div id="game-board" class="hidden">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="p-4 bg-zinc-900 border-l-4 border-blue-500 rounded col-span-2">
-                    <span class="text-[10px] text-zinc-500 block uppercase">Your Identity</span>
-                    <span id="role-text" class="font-bold text-lg text-white">ANALYZING...</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                <div class="p-3 bg-zinc-900 border-l-2 border-blue-500">
+                    <span class="text-[9px] text-zinc-500 block">IDENTITY</span>
+                    <span id="role-text" class="font-bold text-xs">ANALYZING...</span>
                 </div>
-                <div class="p-4 bg-zinc-900 border-l-4 border-yellow-500 rounded text-center">
-                    <span class="text-[10px] text-zinc-500 block uppercase">Mission No.</span>
-                    <span id="mission-num-display" class="font-bold text-lg">1</span>
+                <div class="p-3 bg-zinc-900 border-l-2 border-yellow-500">
+                    <span class="text-[9px] text-zinc-500 block">MISSION</span>
+                    <span id="mission-num" class="font-bold text-xs">1</span>
                 </div>
-            </div>
-
-            <div id="player-grid" class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-6"></div>
-
-            <div id="action-center" class="cyber-border p-6 bg-black rounded-lg min-h-[180px] flex flex-col justify-center">
-                <div id="action-ui" class="space-y-4">
-                    <p class="text-center text-zinc-600 italic">Connecting to Neural Link...</p>
+                <div id="vote-progress-panel" class="p-3 bg-zinc-900 border-l-2 border-green-500 col-span-2">
+                    <span class="text-[9px] text-zinc-500 block">VOTING PROGRESS</span>
+                    <span id="vote-stats" class="font-bold text-xs">0 / 0 AGENTS</span>
                 </div>
             </div>
 
-            <div id="host-panel" class="hidden mt-6 p-4 border border-red-900/30 bg-red-950/10 rounded">
-                <p class="text-red-500 text-[10px] mb-2 cyber-font">COMMANDER OVERRIDE</p>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="distributeRoles()" id="start-btn" class="btn-neon text-[10px] px-4 py-2" disabled>START GAME (MIN 10)</button>
-                    <button onclick="passLeader()" class="btn-neon text-[10px] px-4 py-2 border-yellow-600 text-yellow-600">SKIP LEADER 👑</button>
-                    <button onclick="resetGame()" class="btn-neon text-[10px] px-4 py-2 border-red-500 text-red-500">FORMAT SYSTEM (RESET)</button>
+            <div id="player-grid" class="grid grid-cols-3 md:grid-cols-5 gap-2 mb-6"></div>
+
+            <div id="action-center" class="cyber-border p-6 bg-black rounded-lg min-h-[200px] flex flex-col justify-center shadow-[inset_0_0_20px_rgba(0,255,65,0.1)]">
+                <div id="action-ui" class="space-y-4 text-center"></div>
+            </div>
+
+            <div id="host-panel" class="hidden mt-6 p-4 border border-yellow-600/30 bg-yellow-950/10 rounded">
+                <h3 class="text-yellow-500 text-[10px] cyber-font mb-4 underline">ADMIN DATA MONITORING (ROLES)</h3>
+                <div id="admin-spy-grid" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4"></div>
+                <div class="flex gap-2">
+                    <button onclick="distributeRoles()" id="start-btn" class="btn-neon text-[10px] px-4 py-2" disabled>START GAME</button>
+                    <button onclick="resetGame()" class="btn-neon text-[10px] px-4 py-2 border-red-500 text-red-500 font-bold">RESET ALL DATA</button>
                 </div>
             </div>
         </div>
@@ -85,7 +86,7 @@
         let myName = "";
         let isHost = false;
         let players = {};
-        let gameState = { phase: 'Waiting', leaderIdx: 0, missionNum: 1 };
+        let gameState = { phase: 'Waiting', leaderIdx: 0, missionNum: 1, votes: {} };
 
         function joinGame() {
             myName = document.getElementById('username').value.trim();
@@ -99,133 +100,121 @@
         function showGame() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('game-board').classList.remove('hidden');
-            initSync();
-        }
-
-        function initSync() {
             db.ref('/').on('value', (snap) => {
                 const data = snap.val() || {};
                 players = data.players || {};
-                gameState = data.gameState || { phase: 'Waiting', leaderIdx: 0, missionNum: 1 };
-                
+                gameState = data.gameState || { phase: 'Waiting' };
                 updateUI();
             });
         }
 
         function updateUI() {
-            // 1. Update Status & Mission
-            document.getElementById('game-status').innerText = `PHASE: ${gameState.phase}`;
-            document.getElementById('mission-num-display').innerText = gameState.missionNum;
+            const playerKeys = Object.keys(players);
+            const totalPlayers = playerKeys.length;
+            const currentVotes = gameState.votes ? Object.keys(gameState.votes).length : 0;
 
-            // 2. Render Player Grid
+            document.getElementById('game-status').innerText = `PHASE: ${gameState.phase}`;
+            document.getElementById('mission-num').innerText = gameState.missionNum;
+            document.getElementById('vote-stats').innerText = `${currentVotes} / ${totalPlayers} AGENTS`;
+
+            // Render Player Grid
             const grid = document.getElementById('player-grid');
             grid.innerHTML = "";
-            const playerKeys = Object.keys(players);
-            
-            playerKeys.forEach((key) => {
-                const p = players[key];
-                const isMe = p.name === myName;
-                if(isMe) document.getElementById('role-text').innerText = p.role;
-
+            playerKeys.forEach(id => {
+                const p = players[id];
+                if(p.name === myName) document.getElementById('role-text').innerText = p.role;
+                const hasVoted = gameState.votes && gameState.votes[id] !== undefined;
                 grid.innerHTML += `
-                    <div class="p-2 border ${p.inMission ? 'border-blue-400 bg-blue-900/20' : 'border-zinc-800'} rounded text-center relative transition-all">
-                        ${p.isLeader ? '<span class="absolute -top-2 -left-1 text-lg leader-crown">👑</span>' : ''}
-                        <div class="text-[11px] ${isMe ? 'text-green-400 font-bold underline' : 'text-zinc-300'}">${p.name}</div>
-                        ${p.inMission ? '<div class="text-[8px] text-blue-400 font-bold">🚀 MISSION</div>' : ''}
-                    </div>
-                `;
+                    <div class="p-2 border ${p.inMission ? 'border-blue-400 bg-blue-900/20' : 'border-zinc-800'} rounded text-center relative">
+                        ${p.isLeader ? '<span class="absolute -top-2 -left-1 text-lg">👑</span>' : ''}
+                        <div class="text-[10px] ${p.name === myName ? 'text-green-400 font-bold' : 'text-zinc-400'}">${p.name}</div>
+                        <div class="vote-card mt-1 ${hasVoted ? 'voted' : ''}">${hasVoted ? 'VOTED' : '...'}</div>
+                    </div>`;
             });
 
-            // 3. Render Action Center (หัวใจหลักของปุ่มต่างๆ)
+            // Admin Spy (เห็นโรลทุกคน)
+            if(isHost) {
+                const adminGrid = document.getElementById('admin-spy-grid');
+                adminGrid.innerHTML = "";
+                playerKeys.forEach(id => {
+                    adminGrid.innerHTML += `<div class="text-[9px] p-1 bg-zinc-900 border border-zinc-800 text-zinc-500">${players[id].name}: <span class="text-white">${players[id].role}</span></div>`;
+                });
+                document.getElementById('start-btn').disabled = totalPlayers < 10;
+            }
+
+            // Action UI Logic
             const actionUI = document.getElementById('action-ui');
-            const me = players[myName] || { isLeader: false, inMission: false };
+            const me = players[myName] || {};
             actionUI.innerHTML = "";
 
-            if(gameState.phase === 'Waiting') {
-                actionUI.innerHTML = `<p class="text-center text-zinc-500">Waiting for all agents to connect... (Current: ${playerKeys.length}/10+)</p>`;
-                if(isHost) document.getElementById('start-btn').disabled = playerKeys.length < 10;
-            } 
-            
-            else if(gameState.phase === 'Selecting') {
+            if(gameState.phase === 'Selecting') {
                 if(me.isLeader) {
-                    actionUI.innerHTML = `<h4 class="text-center text-blue-400 cyber-font text-sm mb-2">YOU ARE THE LEADER: SELECT TEAM</h4>`;
-                    let selectGroup = `<div class="grid grid-cols-2 gap-2">`;
+                    const selectedCount = playerKeys.filter(k => players[k].inMission).length;
+                    actionUI.innerHTML = `<p class="text-blue-400 cyber-font text-xs mb-2">CHOOSE TEAM (MAX 6) | SELECTED: ${selectedCount}</p>`;
+                    let btns = `<div class="grid grid-cols-3 gap-2">`;
                     playerKeys.forEach(id => {
-                        selectGroup += `<button onclick="toggleMember('${id}')" class="text-[10px] py-2 border ${players[id].inMission ? 'bg-blue-600 border-white' : 'border-zinc-700'}">${players[id].name}</button>`;
+                        btns += `<button onclick="toggleMember('${id}')" ${selectedCount >= 6 && !players[id].inMission ? 'disabled' : ''} class="text-[10px] py-1 border ${players[id].inMission ? 'bg-blue-600 border-white' : 'border-zinc-700 disabled:opacity-30'}">${players[id].name}</button>`;
                     });
-                    selectGroup += `</div><button onclick="confirmTeam()" class="w-full btn-neon py-3 mt-4 font-bold">CONFIRM SELECTION</button>`;
-                    actionUI.innerHTML += selectGroup;
+                    btns += `</div><button onclick="startVote()" class="w-full btn-neon py-3 mt-4 font-bold" ${selectedCount < 2 ? 'disabled' : ''}>PROPOSE TEAM</button>`;
+                    actionUI.innerHTML += btns;
                 } else {
-                    actionUI.innerHTML = `<p class="text-center animate-pulse text-yellow-500">Leader ${playerKeys[gameState.leaderIdx]} is choosing mission team...</p>`;
+                    actionUI.innerHTML = `<p class="animate-pulse text-yellow-500 text-sm">LEADER IS SELECTING MISSION TEAM...</p>`;
                 }
             }
 
             else if(gameState.phase === 'VotingTeam') {
-                actionUI.innerHTML = `
-                    <h4 class="text-center text-sm mb-4">APPROVE THIS MISSION TEAM?</h4>
-                    <div class="flex gap-4">
-                        <button onclick="voteTeam(true)" class="flex-1 bg-green-700 hover:bg-green-600 py-4 rounded font-bold text-white">APPROVE (เห็นด้วย)</button>
-                        <button onclick="voteTeam(false)" class="flex-1 bg-red-800 hover:bg-red-700 py-4 rounded font-bold text-white">REJECT (ไม่เห็นด้วย)</button>
-                    </div>
-                `;
+                if(gameState.votes && gameState.votes[myName] !== undefined) {
+                    actionUI.innerHTML = `<p class="text-zinc-500 italic">ขอบคุณสำหรับการโหวต... <br>รอผลลัพธ์จากเจ้าหน้าที่คนอื่น</p>`;
+                } else {
+                    actionUI.innerHTML = `
+                        <h4 class="text-sm mb-4">คุณเห็นด้วยกับทีมชุดนี้หรือไม่?</h4>
+                        <div class="flex gap-4">
+                            <button onclick="castVote(true)" class="flex-1 bg-green-700 py-4 rounded font-bold">APPROVE</button>
+                            <button onclick="castVote(false)" class="flex-1 bg-red-800 py-4 rounded font-bold">REJECT</button>
+                        </div>`;
+                }
+                if(isHost && currentVotes >= totalPlayers) processVoteResult();
             }
 
             else if(gameState.phase === 'OnMission') {
                 if(me.inMission) {
                     actionUI.innerHTML = `
-                        <h4 class="text-center text-sm mb-4 text-blue-300">EXECUTE MISSION</h4>
+                        <h4 class="text-sm mb-4 text-blue-300 cyber-font">MISSION AUTHORIZED</h4>
                         <div class="flex gap-4">
                             <button onclick="finishMission(true)" class="flex-1 bg-blue-600 py-6 rounded font-bold">SUCCESS</button>
-                            <button onclick="finishMission(false)" class="flex-1 border border-red-500 text-red-500 py-6 rounded font-bold">SABOTAGE (FAIL)</button>
-                        </div>
-                    `;
+                            <button onclick="finishMission(false)" class="flex-1 border border-red-500 text-red-500 py-6 rounded font-bold">SABOTAGE</button>
+                        </div>`;
                 } else {
-                    actionUI.innerHTML = `<p class="text-center text-zinc-500 italic animate-pulse">Mission agents are operating... Please wait for results.</p>`;
+                    actionUI.innerHTML = `<p class="animate-pulse text-blue-400">MISSION IN PROGRESS... <br>ตรวจสอบสัญญาณจากพื้นที่</p>`;
                 }
             }
         }
 
-        // --- DATABASE ACTIONS ---
-
-        function distributeRoles() {
-            const keys = Object.keys(players);
-            const count = keys.length;
-            let evilCount = Math.floor(count * 0.4); 
-            let pool = ['MERLIN (Good)', 'ASSASSIN (Evil)'];
-            for(let i=0; i < (count - evilCount - 1); i++) pool.push('Servant (Good)');
-            for(let i=0; i < (evilCount - 1); i++) pool.push('Minion (Evil)');
-            pool = pool.sort(() => Math.random() - 0.5);
-
-            const updates = {};
-            keys.forEach((id, idx) => {
-                updates[`players/${id}/role`] = pool[idx];
-                updates[`players/${id}/isLeader`] = (idx === 0);
-                updates[`players/${id}/inMission`] = false;
-            });
-            updates['gameState'] = { phase: 'Selecting', leaderIdx: 0, missionNum: 1 };
-            db.ref().update(updates);
+        // --- FUNCTIONS ---
+        function toggleMember(id) { db.ref(`players/${id}/inMission`).set(!players[id].inMission); }
+        function startVote() { db.ref('gameState').update({ phase: 'VotingTeam', votes: {} }); }
+        
+        function castVote(isApprove) {
+            db.ref(`gameState/votes/${myName}`).set(isApprove);
         }
 
-        function toggleMember(id) {
-            db.ref(`players/${id}/inMission`).set(!players[id].inMission);
-        }
+        function processVoteResult() {
+            const votes = Object.values(gameState.votes);
+            const approves = votes.filter(v => v === true).length;
+            const rejects = votes.filter(v => v === false).length;
 
-        function confirmTeam() {
-            db.ref('gameState/phase').set('VotingTeam');
-        }
-
-        function voteTeam(approve) {
-            if(!approve) {
-                alert("Team Rejected! Passing leader...");
-                passLeader();
-            } else {
+            if(approves > rejects) {
+                alert(`โหวตผ่าน! (เห็นด้วย ${approves}, ไม่เห็นด้วย ${rejects})`);
                 db.ref('gameState/phase').set('OnMission');
+                db.ref('gameState/votes').remove(); // Clear votes for next time
+            } else {
+                alert(`โหวตไม่ผ่าน! (เห็นด้วย ${approves}, ไม่เห็นด้วย ${rejects}) เปลี่ยนหัวหน้าทีม...`);
+                passLeader();
             }
         }
 
         function finishMission(success) {
-            alert(success ? "Mission data sent!" : "Sabotage complete!");
-            // ในที่นี้ให้ระบบวนไปเลือกทีมใหม่ (รอบถัดไป)
+            alert(success ? "ภารกิจสำเร็จ!" : "คุณได้ทำการทำลายภารกิจ!");
             passLeader();
             db.ref('gameState/missionNum').transaction(n => (n || 1) + 1);
         }
@@ -240,15 +229,30 @@
             });
             updates['gameState/leaderIdx'] = nextIdx;
             updates['gameState/phase'] = 'Selecting';
+            updates['gameState/votes'] = null;
             db.ref().update(updates);
         }
 
-        function resetGame() {
-            if(confirm("REBOOT SYSTEM? All data will be wiped.")) {
-                db.ref('/').set({ timer: 0 });
-                location.reload();
-            }
+        function distributeRoles() {
+            const keys = Object.keys(players);
+            const count = keys.length;
+            let evilCount = Math.floor(count * 0.4);
+            let pool = ['MERLIN (Good)', 'ASSASSIN (Evil)'];
+            for(let i=0; i < (count - evilCount - 1); i++) pool.push('Servant (Good)');
+            for(let i=0; i < (evilCount - 1); i++) pool.push('Minion (Evil)');
+            pool = pool.sort(() => Math.random() - 0.5);
+
+            const updates = {};
+            keys.forEach((id, idx) => {
+                updates[`players/${id}/role`] = pool[idx];
+                updates[`players/${id}/isLeader`] = (idx === 0);
+                updates[`players/${id}/inMission`] = false;
+            });
+            updates['gameState'] = { phase: 'Selecting', leaderIdx: 0, missionNum: 1, votes: null };
+            db.ref().update(updates);
         }
+
+        function resetGame() { if(confirm("FORMAT SYSTEM?")) { db.ref('/').set({ timer: 0 }); location.reload(); } }
     </script>
 </body>
 </html>
