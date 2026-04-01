@@ -3,65 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-AVALON: MISSION 2026</title>
+    <title>AI-AVALON: ULTIMATE EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Kanit:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #050505; color: #00ff41; overflow-x: hidden; }
+        body { font-family: 'Kanit', sans-serif; background-color: #050505; color: #00ff41; }
         .cyber-font { font-family: 'Orbitron', sans-serif; }
-        .cyber-border { border: 2px solid #00ff41; box-shadow: 0 0 10px #00ff41; }
-        .btn-neon { background: transparent; border: 1px solid #00ff41; color: #00ff41; transition: 0.3s; cursor: pointer; }
-        .btn-neon:hover { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
-        .host-panel { border-left: 4px solid #fbbf24; background: rgba(251, 191, 36, 0.05); }
+        .cyber-border { border: 1px solid #00ff41; box-shadow: 0 0 10px #00ff41; }
+        .btn-neon { border: 1px solid #00ff41; color: #00ff41; transition: 0.3s; cursor: pointer; }
+        .btn-neon:hover:not(:disabled) { background: #00ff41; color: #000; box-shadow: 0 0 15px #00ff41; }
+        .btn-neon:disabled { border-color: #333; color: #333; cursor: not-allowed; }
+        .leader-crown { color: #fbbf24; text-shadow: 0 0 5px #fbbf24; }
+        .mission-tag { color: #38bdf8; font-size: 0.7rem; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4">
 
     <div id="app" class="max-w-4xl mx-auto">
-        <div class="text-center mb-8">
-            <h1 class="cyber-font text-3xl md:text-5xl font-bold text-neon tracking-widest">AI-AVALON</h1>
-            <div id="timer-display" class="text-4xl font-bold text-yellow-400 mt-4 cyber-font">00:00</div>
-        </div>
-
-        <div id="login-screen" class="cyber-border p-6 rounded-lg bg-black">
-            <h2 class="cyber-font text-xl mb-4 text-center">IDENTIFY AGENT</h2>
-            <input type="text" id="username" placeholder="กรอกชื่อของคุณ..." class="w-full bg-zinc-900 border border-zinc-700 p-4 mb-4 text-green-500 focus:outline-none focus:border-green-400">
-            <button onclick="joinGame()" class="w-full btn-neon py-4 cyber-font font-bold">CONNECT TO SYSTEM</button>
-            <div class="mt-6 text-center">
-                <button onclick="beHost()" class="text-zinc-600 text-xs hover:text-yellow-500 transition underline">ADMIN LOGIN (HOST ONLY)</button>
+        <div class="flex justify-between items-center mb-6 cyber-border p-4 bg-black rounded">
+            <div>
+                <h1 class="cyber-font text-xl font-bold">SYSTEM: AVALON</h1>
+                <p id="game-status" class="text-xs text-zinc-500">WAITING FOR AGENTS...</p>
             </div>
+            <div id="timer-display" class="cyber-font text-2xl text-yellow-400">00:00</div>
         </div>
 
-        <div id="waiting-room" class="hidden cyber-border p-6 rounded-lg bg-black">
-            <h2 class="cyber-font text-xl mb-4">ONLINE AGENTS: <span id="count" class="text-white">0</span>/20</h2>
-            <div id="player-list" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-8 text-sm italic text-zinc-500"></div>
-            
-            <div id="host-controls" class="hidden host-panel p-4 rounded">
-                <p class="text-yellow-500 text-xs mb-3 font-bold">HOST COMMAND CENTER</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <button onclick="initRoles()" class="btn-neon py-2 text-sm border-yellow-500 text-yellow-500">RANDOM ROLES & START</button>
-                    <button onclick="startTimer(60)" class="btn-neon py-2 text-sm border-blue-500 text-blue-500">SET TIMER 60s</button>
-                    <button onclick="resetGame()" class="btn-neon py-2 text-sm border-red-500 text-red-500 col-span-full">RESET SYSTEM</button>
+        <div id="login-screen" class="cyber-border p-8 rounded bg-zinc-900">
+            <input type="text" id="username" placeholder="รหัสประจำตัวของคุณ..." class="w-full bg-black border border-zinc-700 p-4 mb-4 text-green-500 focus:outline-none">
+            <button onclick="joinGame()" class="w-full btn-neon py-4 cyber-font">INITIALIZE</button>
+            <button onclick="beHost()" class="w-full text-zinc-600 text-xs mt-4 underline">HOST DASHBOARD</button>
+        </div>
+
+        <div id="game-board" class="hidden">
+            <div id="personal-role" class="mb-4 p-4 bg-zinc-900 border-l-4 border-blue-500">
+                <span class="text-xs text-zinc-400">IDENTITY:</span>
+                <span id="role-text" class="font-bold ml-2">ANALYZING...</span>
+            </div>
+
+            <div id="player-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
+
+            <div id="action-area" class="cyber-border p-6 bg-black rounded mb-6 min-h-[150px]">
+                <h3 id="action-title" class="cyber-font text-sm mb-4 text-yellow-500 underline">SYSTEM MESSAGE</h3>
+                <div id="action-content" class="flex flex-col gap-3">
+                    </div>
+            </div>
+
+            <div id="host-panel" class="hidden p-4 border border-yellow-900 bg-yellow-950/10 rounded">
+                <p class="text-yellow-500 text-[10px] mb-2 cyber-font">ADMIN OVERRIDE</p>
+                <div class="flex gap-2">
+                    <button onclick="distributeRoles()" id="start-btn" class="btn-neon text-[10px] px-3 py-1" disabled>START (MIN 10)</button>
+                    <button onclick="resetGame()" class="btn-neon text-[10px] px-3 py-1 border-red-500 text-red-500">RESET</button>
                 </div>
             </div>
-        </div>
-
-        <div id="role-display" class="hidden text-center p-12 cyber-border bg-zinc-900 rounded-lg">
-            <p class="text-zinc-400 uppercase tracking-widest text-xs mb-2">Your Secret Identity</p>
-            <h2 id="my-role" class="text-4xl font-bold text-white mb-6 shadow-sm">Analyzing...</h2>
-            <div id="role-desc" class="text-sm text-zinc-400 max-w-xs mx-auto"></div>
-        </div>
-
-        <div id="host-dashboard" class="hidden mt-8 p-4 border-t border-zinc-800">
-            <h3 class="cyber-font text-yellow-500 mb-4 text-sm">REAL-TIME MONITORING</h3>
-            <div id="admin-table" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyDbQMmh1szC4ANGJZihJazUzvtVjYHE44c",
             authDomain: "activitiesm3-2026.firebaseapp.com",
@@ -77,115 +76,162 @@
 
         let myName = "";
         let isHost = false;
+        let playersData = {};
+        let gameState = {};
 
-        // --- FUNCTIONS ---
         function joinGame() {
             myName = document.getElementById('username').value.trim();
-            if(!myName) return alert("กรุณาระบุชื่อรหัส!");
-            
-            db.ref('players/' + myName).set({ name: myName, role: "Pending..." });
-            showScreen('waiting-room');
-            listenToData();
+            if(!myName) return alert("กรุณาใส่ชื่อ!");
+            db.ref('players/' + myName).set({ name: myName, role: "Pending", isLeader: false, inMission: false });
+            showBoard();
         }
 
-        function beHost() {
-            isHost = true;
-            document.getElementById('host-controls').classList.remove('hidden');
-            showScreen('waiting-room');
-            listenToData();
+        function beHost() { isHost = true; document.getElementById('host-panel').classList.remove('hidden'); showBoard(); }
+
+        function showBoard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('game-board').classList.remove('hidden');
+            listenToGame();
         }
 
-        function listenToData() {
-            // ฟังข้อมูลผู้เล่น
-            db.ref('players').on('value', (snap) => {
-                const data = snap.val() || {};
-                const list = document.getElementById('player-list');
-                const adminTable = document.getElementById('admin-table');
-                
-                list.innerHTML = "";
-                adminTable.innerHTML = "";
-                let count = 0;
+        function listenToGame() {
+            db.ref('/').on('value', (snap) => {
+                const data = snap.val();
+                playersData = data.players || {};
+                gameState = data.gameState || { phase: 'Waiting', leaderIdx: 0, missionNum: 1 };
+                renderPlayers();
+                renderActions();
+                updateStatus();
+            });
+        }
 
-                for(let id in data) {
-                    count++;
-                    list.innerHTML += `<div class="p-2 border border-zinc-800 rounded text-center">[ ${data[id].name} ]</div>`;
-                    
-                    if(isHost) {
-                        adminTable.innerHTML += `
-                            <div class="flex justify-between p-2 bg-zinc-900 text-xs border-l-2 border-yellow-500">
-                                <span>${data[id].name}</span>
-                                <span class="text-white">${data[id].role}</span>
-                            </div>`;
-                    }
+        function renderPlayers() {
+            const grid = document.getElementById('player-grid');
+            grid.innerHTML = "";
+            let i = 0;
+            for(let id in playersData) {
+                const p = playersData[id];
+                const isMyCard = p.name === myName;
+                if(isMyCard) document.getElementById('role-text').innerText = p.role;
 
-                    if(data[id].name === myName && data[id].role !== "Pending...") {
-                        displayMyRole(data[id].role);
+                grid.innerHTML += `
+                    <div class="p-3 bg-zinc-900 border ${p.inMission ? 'border-blue-500' : 'border-zinc-800'} rounded relative">
+                        ${p.isLeader ? '<span class="leader-crown absolute -top-2 -left-1">👑</span>' : ''}
+                        <div class="text-xs ${isMyCard ? 'text-green-400 font-bold' : 'text-white'}">${p.name}</div>
+                        ${p.inMission ? '<div class="mission-tag">🚀 ON MISSION</div>' : ''}
+                    </div>
+                `;
+                i++;
+            }
+            if(isHost) document.getElementById('start-btn').disabled = Object.keys(playersData).length < 10;
+        }
+
+        function renderActions() {
+            const content = document.getElementById('action-content');
+            const title = document.getElementById('action-title');
+            const me = playersData[myName] || {};
+            content.innerHTML = "";
+
+            if(gameState.phase === 'Waiting') {
+                title.innerText = "WAITING ROOM";
+                content.innerHTML = `<p class="text-xs">รอสมาชิกให้ครบ (ขั้นต่ำ 10 คน) เพื่อเริ่มเกม</p>`;
+            } 
+            else if(gameState.phase === 'Selecting') {
+                title.innerText = "MISSION TEAM SELECTION";
+                if(me.isLeader) {
+                    content.innerHTML = `<p class="text-xs mb-2 text-blue-400">คุณคือหัวหน้า! เลือกสมาชิกไปทำภารกิจ:</p>`;
+                    for(let id in playersData) {
+                        content.innerHTML += `<button onclick="toggleMission('${id}')" class="text-[10px] p-1 border border-zinc-700 mb-1 ${playersData[id].inMission ? 'bg-blue-900' : ''}">${playersData[id].name}</button>`;
                     }
+                    content.innerHTML += `<button onclick="submitTeam()" class="btn-neon py-2 mt-2 font-bold">ยืนยันทีม</button>`;
+                } else {
+                    content.innerHTML = `<p class="text-xs animate-pulse">หัวหน้ากำลังเลือกทีม...</p>`;
                 }
-                document.getElementById('count').innerText = count;
-            });
-
-            // ฟังนาฬิกา
-            db.ref('timer').on('value', (snap) => {
-                let sec = snap.val() || 0;
-                let m = Math.floor(sec / 60).toString().padStart(2, '0');
-                let s = (sec % 60).toString().padStart(2, '0');
-                document.getElementById('timer-display').innerText = `${m}:${s}`;
-                if(sec > 0 && sec <= 10) document.getElementById('timer-display').classList.add('text-red-500');
-                else document.getElementById('timer-display').classList.remove('text-red-500');
-            });
-        }
-
-        function initRoles() {
-            db.ref('players').once('value', (snap) => {
-                let players = Object.keys(snap.val());
-                let pool = [
-                    'MERLIN (Good)', 'ASSASSIN (Evil)',
-                    ...Array(12).fill('Servant (Good)'),
-                    ...Array(6).fill('Minion (Evil)')
-                ].sort(() => Math.random() - 0.5);
-
-                players.forEach((id, i) => {
-                    db.ref('players/' + id).update({ role: pool[i] || 'Citizen' });
-                });
-            });
-        }
-
-        function displayMyRole(role) {
-            showScreen('role-display');
-            const roleEl = document.getElementById('my-role');
-            roleEl.innerText = role;
-            roleEl.className = role.includes('Good') ? 'text-4xl font-bold text-blue-400 mb-6' : 'text-4xl font-bold text-red-500 mb-6';
-            
-            document.getElementById('role-desc').innerText = 
-                role.includes('MERLIN') ? "คุณรู้ว่าใครคือฝ่ายร้าย แต่ห้ามให้ใครรู้ตัวจริงของคุณ!" :
-                role.includes('Good') ? "ร่วมมือกับเพื่อนทำภารกิจให้สำเร็จ และหาตัว Merlin ให้เจอเพื่อปกป้องเขา" :
-                "ทำลายภารกิจอย่างแนบเนียน และปั่นหัวฝ่ายดีให้ทายผิด";
-        }
-
-        function startTimer(s) {
-            let time = s;
-            const interval = setInterval(() => {
-                db.ref('timer').set(time);
-                if(time <= 0) clearInterval(interval);
-                time--;
-            }, 1000);
-        }
-
-        function resetGame() {
-            if(confirm("ยืนยันการรีเซ็ตระบบทั้งหมด?")) {
-                db.ref('/').set({ timer: 0 });
-                location.reload();
+            }
+            else if(gameState.phase === 'VotingTeam') {
+                title.innerText = "APPROVE THIS TEAM?";
+                content.innerHTML = `
+                    <div class="flex gap-2">
+                        <button onclick="voteTeam(true)" class="flex-1 bg-green-900 py-4 rounded font-bold">เห็นด้วย</button>
+                        <button onclick="voteTeam(false)" class="flex-1 bg-red-900 py-4 rounded font-bold">ไม่เห็นด้วย</button>
+                    </div>
+                `;
+            }
+            else if(gameState.phase === 'OnMission') {
+                title.innerText = "MISSION IN PROGRESS";
+                if(me.inMission) {
+                    content.innerHTML = `
+                        <p class="text-xs mb-2 text-yellow-500">คุณได้รับเลือก! ตัดสินใจอนาคตของภารกิจ:</p>
+                        <div class="flex gap-2">
+                            <button onclick="voteMission(true)" class="flex-1 bg-blue-600 py-4 rounded font-bold">สำเร็จ (SUCCESS)</button>
+                            <button onclick="voteMission(false)" class="flex-1 bg-black border border-red-500 text-red-500 py-4 rounded font-bold">ล้มเหลว (FAIL)</button>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = `<p class="text-xs italic text-zinc-500 text-center">ภารกิจกำลังดำเนินอยู่... <br>โปรดรอผลลัพธ์อย่างตื่นเต้น</p>`;
+                }
             }
         }
 
-        function showScreen(id) {
-            ['login-screen', 'waiting-room', 'role-display'].forEach(s => {
-                document.getElementById(s).classList.add('hidden');
+        // --- GAME LOGIC FUNCTIONS ---
+
+        function distributeRoles() {
+            const keys = Object.keys(playersData);
+            const count = keys.length;
+            let evilCount = Math.floor(count * 0.4);
+            let pool = ['MERLIN (Good)', 'ASSASSIN (Evil)'];
+            for(let i=0; i < (count - evilCount - 1); i++) pool.push('Servant (Good)');
+            for(let i=0; i < (evilCount - 1); i++) pool.push('Minion (Evil)');
+            pool = pool.sort(() => Math.random() - 0.5);
+
+            const updates = {};
+            keys.forEach((id, idx) => {
+                updates[`players/${id}/role`] = pool[idx];
+                updates[`players/${id}/isLeader`] = (idx === 0);
             });
-            document.getElementById(id).classList.remove('hidden');
-            if(isHost && id !== 'login-screen') document.getElementById('host-dashboard').classList.remove('hidden');
+            updates['gameState'] = { phase: 'Selecting', leaderIdx: 0, missionNum: 1, voteCount: 0 };
+            db.ref().update(updates);
         }
+
+        function toggleMission(id) {
+            db.ref(`players/${id}/inMission`).set(!playersData[id].inMission);
+        }
+
+        function submitTeam() {
+            db.ref('gameState/phase').set('VotingTeam');
+        }
+
+        function voteTeam(isApprove) {
+            // ระบบโหวตแบบ Simple: ถ้าไม่ผ่านให้เวียนหัวหน้า
+            if(!isApprove) {
+                alert("โหวตไม่ผ่าน! เปลี่ยนหัวหน้าทีม");
+                passLeader();
+            } else {
+                db.ref('gameState/phase').set('OnMission');
+            }
+        }
+
+        function voteMission(isSuccess) {
+            alert(isSuccess ? "คุณส่งข้อมูลสำเร็จ!" : "คุณแอบทำลายภารกิจ!");
+            // Logic: เมื่อคนสุดท้ายโหวตเสร็จ ให้จบรอบ (ในที่นี้ใช้ Admin กดจบรอบเพื่อความง่ายของครู)
+            db.ref('gameState/phase').set('RoundEnd');
+        }
+
+        function passLeader() {
+            const keys = Object.keys(playersData);
+            let nextIdx = (gameState.leaderIdx + 1) % keys.length;
+            const updates = {};
+            keys.forEach((id, idx) => {
+                updates[`players/${id}/isLeader`] = (idx === nextIdx);
+                updates[`players/${id}/inMission`] = false;
+            });
+            updates['gameState/leaderIdx'] = nextIdx;
+            updates['gameState/phase'] = 'Selecting';
+            db.ref().update(updates);
+        }
+
+        function resetGame() { if(confirm("ล้างข้อมูลทั้งหมด?")) db.ref('/').set({ timer: 0 }); location.reload(); }
+        function updateStatus() { document.getElementById('game-status').innerText = `PHASE: ${gameState.phase} | MISSION: ${gameState.missionNum}`; }
     </script>
 </body>
 </html>
