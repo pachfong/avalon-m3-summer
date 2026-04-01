@@ -3,73 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-AVALON: PROTOCOL 4 DISCLOSURE</title>
+    <title>AVALON: FINAL PROTOCOL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Kanit:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #050505; color: #00ff41; }
+        body { font-family: 'Kanit', sans-serif; background-color: #050505; color: #00ff41; overflow-x: hidden; }
         .cyber-font { font-family: 'Orbitron', sans-serif; }
-        .cyber-border { border: 1px solid #00ff41; box-shadow: 0 0 8px #00ff41; }
-        .btn-neon { border: 1px solid #00ff41; color: #00ff41; transition: 0.3s; cursor: pointer; background: rgba(0,0,0,0.5); }
-        .btn-neon:hover:not(:disabled) { background: #00ff41; color: #000; box-shadow: 0 0 15px #00ff41; }
-        .btn-neon:disabled { border-color: #333; color: #333; cursor: not-allowed; opacity: 0.3; }
-        .score-box { width: 35px; height: 35px; border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
-        .score-good { background: #1e40af; border-color: #3b82f6; color: white; box-shadow: 0 0 10px #3b82f6; }
-        .score-evil { background: #7f1d1d; border-color: #ef4444; color: white; box-shadow: 0 0 10px #ef4444; }
-        .mission-card { width: 60px; height: 90px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: #111; border: 2px solid #333; transition: 0.5s; }
-        .card-success { border-color: #3b82f6; color: #3b82f6; box-shadow: 0 0 15px #3b82f6; }
-        .card-fail { border-color: #ef4444; color: #ef4444; box-shadow: 0 0 15px #ef4444; }
+        .cyber-border { border: 1px solid #00ff41; box-shadow: 0 0 10px rgba(0,255,65,0.2); }
+        .btn-neon { border: 1px solid #00ff41; color: #00ff41; transition: 0.3s; cursor: pointer; background: rgba(0,0,0,0.6); }
+        .btn-neon:hover:not(:disabled) { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
+        .btn-neon:disabled { border-color: #333; color: #333; cursor: not-allowed; opacity: 0.2; }
+        .score-box { width: 40px; height: 40px; border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 4px; }
+        .score-good { background: #1e40af; border-color: #3b82f6; color: white; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        .score-evil { background: #7f1d1d; border-color: #ef4444; color: white; box-shadow: 0 0 15px rgba(239,68,68,0.5); }
+        .mission-card { width: 70px; height: 100px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; background: #111; border: 2px solid #333; animation: flip 0.6s ease-in-out; }
+        @keyframes flip { from { transform: rotateY(90deg); opacity: 0; } to { transform: rotateY(0deg); opacity: 1; } }
+        .card-success { border-color: #3b82f6; color: #3b82f6; }
+        .card-fail { border-color: #ef4444; color: #ef4444; }
+        .admin-badge { background: #facc15; color: #000; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 md:p-8">
 
     <div id="app" class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-6 cyber-border p-4 bg-black rounded">
-            <div>
-                <h1 class="cyber-font text-lg font-bold text-neon uppercase">Avalon: Disclosure</h1>
-                <p id="game-status" class="text-[10px] text-yellow-500 uppercase">SYSTEM ACTIVE</p>
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 cyber-border p-4 bg-black rounded-lg gap-4">
+            <div class="text-center md:text-left">
+                <h1 class="cyber-font text-2xl font-bold text-white tracking-tighter">AVALON <span class="text-green-500">FINAL</span></h1>
+                <p id="game-status" class="text-[10px] text-yellow-500 uppercase tracking-widest">Neural Link Established</p>
             </div>
-            <div class="flex gap-2" id="scoreboard">
-                <div class="score-box" id="m1">-</div>
-                <div class="score-box" id="m2">-</div>
-                <div class="score-box" id="m3">-</div>
-                <div class="score-box" id="m4">-</div>
-                <div class="score-box" id="m5">-</div>
+            <div class="flex gap-3" id="scoreboard">
+                <div class="score-box" id="m1">1</div>
+                <div class="score-box" id="m2">2</div>
+                <div class="score-box" id="m3">3</div>
+                <div class="score-box" id="m4">4</div>
+                <div class="score-box" id="m5">5</div>
             </div>
         </div>
 
-        <div id="login-screen" class="cyber-border p-8 rounded bg-zinc-900 text-center">
-            <input type="text" id="username" placeholder="NAME AGENT" class="w-full bg-black border border-zinc-700 p-4 mb-4 text-green-500 text-center outline-none">
-            <button onclick="joinGame()" class="w-full btn-neon py-4 cyber-font font-bold">IDENTITY ACCESS</button>
-            <button onclick="beHost()" class="text-zinc-600 text-[10px] mt-6 block mx-auto underline italic">COMMANDER OVERRIDE</button>
+        <div id="login-screen" class="cyber-border p-10 rounded-xl bg-zinc-900/50 text-center backdrop-blur-sm">
+            <h2 class="cyber-font text-green-500 mb-6 tracking-widest">AGENT IDENTIFICATION</h2>
+            <input type="text" id="username" placeholder="ENTER AGENT NAME" class="w-full bg-black border-2 border-zinc-800 p-5 mb-6 text-green-400 text-center text-xl focus:border-green-500 outline-none transition-all">
+            <button onclick="joinGame()" class="w-full btn-neon py-5 cyber-font font-bold text-lg rounded-lg">INITIALIZE LINK</button>
+            <button onclick="beHost()" class="text-zinc-600 text-[10px] mt-8 block mx-auto underline hover:text-zinc-400 transition-colors">COMMANDER ACCESS (ADMIN)</button>
         </div>
 
-        <div id="game-board" class="hidden">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
-                <div class="p-3 bg-zinc-900 border-l-2 border-blue-500 rounded">
-                    <span class="text-[9px] text-zinc-500 block uppercase">Your Role</span>
-                    <span id="role-text" class="font-bold text-xs uppercase text-white">ANALYZING...</span>
+        <div id="game-board" class="hidden animate-in fade-in duration-700">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                <div class="p-4 bg-zinc-900 border-l-4 border-blue-500 rounded-lg">
+                    <span class="text-[10px] text-zinc-500 block uppercase font-bold">Encrypted Identity</span>
+                    <span id="role-text" class="font-bold text-lg uppercase text-white tracking-wide">WAITING...</span>
                 </div>
-                <div class="p-3 bg-zinc-900 border-l-2 border-green-500 col-span-2 rounded">
-                    <span class="text-[9px] text-zinc-500 block uppercase">Mission Progress</span>
-                    <span id="progress-stats" class="font-bold text-xs">Waiting...</span>
+                <div class="p-4 bg-zinc-900 border-l-4 border-yellow-500 rounded-lg flex justify-between items-center">
+                    <div>
+                        <span class="text-[10px] text-zinc-500 block uppercase font-bold">Mission Progress</span>
+                        <span id="progress-stats" class="text-sm font-medium text-yellow-500">Synchronizing...</span>
+                    </div>
                 </div>
             </div>
 
-            <div id="player-grid" class="grid grid-cols-3 md:grid-cols-5 gap-2 mb-6"></div>
+            <div id="player-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-8"></div>
 
-            <div id="action-center" class="cyber-border p-6 bg-black rounded-lg min-h-[250px] flex flex-col justify-center shadow-[inset_0_0_20px_rgba(0,255,65,0.05)]">
-                <div id="action-ui" class="space-y-4 text-center"></div>
+            <div id="action-center" class="cyber-border p-8 bg-black/80 rounded-2xl min-h-[300px] flex flex-col justify-center relative overflow-hidden">
+                <div id="action-ui" class="space-y-6 text-center z-10"></div>
+                <div class="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
             </div>
 
-            <div id="host-panel" class="hidden mt-6 p-4 border border-yellow-600/30 bg-yellow-950/10 rounded">
-                <h3 class="text-yellow-500 text-[10px] cyber-font mb-4 underline">ADMIN DATA FEED</h3>
-                <div id="admin-spy-grid" class="grid grid-cols-2 md:grid-cols-4 gap-1 mb-4"></div>
-                <div class="flex gap-2">
-                    <button onclick="distributeRoles()" id="start-btn" class="btn-neon text-[10px] px-4 py-2" disabled>START GAME</button>
-                    <button onclick="resetGame()" class="btn-neon text-[10px] px-4 py-2 border-red-500 text-red-500 font-bold uppercase">Format DB</button>
+            <div id="host-panel" class="hidden mt-8 p-6 border border-yellow-600/20 bg-yellow-950/5 rounded-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-yellow-500 text-xs cyber-font underline">COMMANDER INTEL</h3>
+                    <div id="admin-notif" class="flex gap-2"></div>
+                </div>
+                <div id="admin-spy-grid" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6"></div>
+                <div class="flex gap-3">
+                    <button onclick="distributeRoles()" id="start-btn" class="flex-1 btn-neon text-xs py-3 rounded-md uppercase font-bold" disabled>Launch Mission</button>
+                    <button onclick="resetGame()" class="px-6 btn-neon text-xs border-red-900 text-red-500 rounded-md">RESET</button>
                 </div>
             </div>
         </div>
@@ -115,119 +124,110 @@
         }
 
         function updateUI() {
-            const playerKeys = Object.keys(players);
-            const teamSize = playerKeys.filter(k => players[k].inMission).length;
-            document.getElementById('game-status').innerText = `PHASE: ${gameState.phase} | MISSION: ${gameState.missionNum || 1}`;
-
-            // Scoreboard
-            if(gameState.history) {
-                gameState.history.forEach((res, i) => {
-                    const el = document.getElementById(`m${i+1}`);
-                    el.innerText = res === 'SUCCESS' ? '✓' : '✗';
-                    el.className = `score-box ${res === 'SUCCESS' ? 'score-good' : 'score-evil'}`;
-                });
-            }
-
-            // Player Grid
-            const grid = document.getElementById('player-grid');
-            grid.innerHTML = "";
-            playerKeys.forEach(id => {
-                const p = players[id];
-                if(p.name === myName) document.getElementById('role-text').innerText = p.role;
-                grid.innerHTML += `
-                    <div class="p-2 border ${p.inMission ? 'border-blue-500 bg-blue-900/30' : 'border-zinc-800'} rounded relative text-center">
-                        ${p.isLeader ? '<span class="absolute -top-2 -left-1 text-lg">👑</span>' : ''}
-                        <div class="text-[10px] ${p.name === myName ? 'text-green-400 font-bold' : 'text-zinc-500'}">${p.name}</div>
-                    </div>`;
-            });
-
-            // Action UI
+            const keys = Object.keys(players);
+            const teamSize = keys.filter(k => players[k].inMission).length;
             const ui = document.getElementById('action-ui');
             const me = players[myName] || {};
             ui.innerHTML = "";
 
+            // Scoreboard sync
+            if(gameState.history) {
+                gameState.history.forEach((res, i) => {
+                    const el = document.getElementById(`m${i+1}`);
+                    el.className = `score-box ${res === 'SUCCESS' ? 'score-good' : 'score-evil'}`;
+                    el.innerText = res === 'SUCCESS' ? '✓' : '✗';
+                });
+            }
+
+            // Player Cards
+            const grid = document.getElementById('player-grid');
+            grid.innerHTML = "";
+            keys.forEach(id => {
+                const p = players[id];
+                if(p.name === myName) document.getElementById('role-text').innerText = p.role;
+                grid.innerHTML += `
+                    <div class="p-3 border-2 ${p.inMission ? 'border-blue-500 bg-blue-900/20' : 'border-zinc-800 bg-zinc-900/30'} rounded-lg transition-all">
+                        <div class="text-[12px] ${p.name === myName ? 'text-green-400 font-bold' : 'text-zinc-400'}">
+                            ${p.isLeader ? '👑 ' : ''}${p.name}
+                        </div>
+                    </div>`;
+            });
+
+            // PHASE LOGIC
             if(gameState.phase === 'Selecting') {
-                document.getElementById('progress-stats').innerText = `Leader selecting 4 agents (${teamSize}/4)`;
+                document.getElementById('progress-stats').innerText = `Leader Choosing Agents (${teamSize}/4)`;
                 if(me.isLeader) {
-                    ui.innerHTML = `<p class="text-blue-400 text-xs mb-2">CHOOSE 4 AGENTS</p><div class="grid grid-cols-3 gap-1">`;
-                    playerKeys.forEach(id => {
-                        ui.innerHTML += `<button onclick="toggleMember('${id}')" ${teamSize >= 4 && !players[id].inMission ? 'disabled' : ''} class="text-[9px] py-2 border ${players[id].inMission ? 'bg-blue-600' : 'border-zinc-700'}">${players[id].name}</button>`;
+                    ui.innerHTML = `<h3 class="text-blue-400 cyber-font text-lg mb-6">MISSION TEAM SELECTION</h3><div class="flex flex-col gap-3">`;
+                    keys.forEach(id => {
+                        ui.innerHTML += `<button onclick="toggleMember('${id}')" ${teamSize >= 4 && !players[id].inMission ? 'disabled' : ''} class="w-full py-4 text-md border-2 rounded-xl transition-all font-bold ${players[id].inMission ? 'bg-blue-600 border-white text-white' : 'border-zinc-800 text-zinc-500'}">${players[id].name}</button>`;
                     });
-                    ui.innerHTML += `</div><button onclick="startVote()" class="w-full btn-neon py-3 mt-4" ${teamSize !== 4 ? 'disabled' : ''}>START PROPOSAL</button>`;
-                } else ui.innerHTML = `<p class="animate-pulse text-yellow-500">LEADER CHOOSING TEAM...</p>`;
+                    ui.innerHTML += `</div><button onclick="startVote()" class="w-full btn-neon py-5 mt-8 font-bold text-xl rounded-2xl" ${teamSize !== 4 ? 'disabled' : ''}>PROPOSE TEAM OF 4</button>`;
+                } else ui.innerHTML = `<div class="p-10"><div class="animate-spin h-10 w-10 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-4"></div><p class="text-yellow-500 animate-pulse cyber-font">LEADER IS ASSEMBLING TEAM...</p></div>`;
             }
 
             else if(gameState.phase === 'VotingTeam') {
                 const vCount = gameState.votes ? Object.keys(gameState.votes).length : 0;
-                document.getElementById('progress-stats').innerText = `TEAM VOTE: ${vCount}/${playerKeys.length}`;
-                if(gameState.votes && gameState.votes[myName] !== undefined) ui.innerHTML = `<p class="text-zinc-500 italic">VOTE REGISTERED</p>`;
-                else ui.innerHTML = `<h4 class="text-sm mb-4">APPROVE THIS 4-MAN TEAM?</h4><div class="flex gap-4"><button onclick="castVote(true)" class="flex-1 bg-green-700 py-4 rounded font-bold">YES</button><button onclick="castVote(false)" class="flex-1 bg-red-900 py-4 rounded font-bold">NO</button></div>`;
-                if(isHost && vCount >= playerKeys.length) processTeamVote();
+                document.getElementById('progress-stats').innerText = `Votes Collected: ${vCount}/${keys.length}`;
+                if(gameState.votes && gameState.votes[myName] !== undefined) ui.innerHTML = `<p class="text-zinc-500 italic text-lg cyber-font">VOTE CASTED. AWAITING OTHERS...</p>`;
+                else ui.innerHTML = `<h3 class="text-xl mb-8">APPROVE THIS 4-MAN SQUAD?</h3><div class="flex flex-col gap-4"><button onclick="castVote(true)" class="w-full bg-green-600 py-6 rounded-2xl font-bold text-2xl shadow-lg">APPROVE</button><button onclick="castVote(false)" class="w-full border-2 border-red-600 text-red-600 py-6 rounded-2xl font-bold text-2xl">REJECT</button></div>`;
+                if(isHost) document.getElementById('admin-notif').innerHTML = `<span class="admin-badge">VOTES: ${vCount}/${keys.length}</span>`;
+                if(isHost && vCount >= keys.length) processTeamVote();
             }
 
             else if(gameState.phase === 'OnMission') {
                 const mVotes = gameState.missionVotes ? Object.keys(gameState.missionVotes).length : 0;
-                document.getElementById('progress-stats').innerText = `MISSION VOTE: ${mVotes}/4`;
+                document.getElementById('progress-stats').innerText = `Active Mission: ${mVotes}/4 Actions Sent`;
                 if(me.inMission) {
-                    if(gameState.missionVotes && gameState.missionVotes[myName] !== undefined) ui.innerHTML = `<p class="text-blue-500 animate-pulse">SECRET DATA SENT...</p>`;
+                    if(gameState.missionVotes && gameState.missionVotes[myName] !== undefined) ui.innerHTML = `<p class="text-blue-500 animate-pulse text-lg cyber-font">ACTION ENCRYPTED & SENT</p>`;
                     else {
                         const isEvil = me.role.includes('Evil');
-                        ui.innerHTML = `<h4 class="text-sm mb-4 text-blue-300">EXECUTE MISSION</h4><div class="flex gap-4">
-                            <button onclick="castMissionVote(true)" class="flex-1 bg-blue-600 py-6 rounded font-bold">SUCCESS</button>
-                            ${isEvil ? '<button onclick="castMissionVote(false)" class="flex-1 border border-red-500 text-red-500 py-6 rounded font-bold">FAIL</button>' : ''}
+                        ui.innerHTML = `<h3 class="text-xl mb-8 text-blue-400 cyber-font">MISSION EXECUTION</h3><div class="flex flex-col gap-4">
+                            <button onclick="castMissionVote(true)" class="w-full bg-blue-600 py-8 rounded-2xl font-bold text-2xl">SUCCESS</button>
+                            ${isEvil ? '<button onclick="castMissionVote(false)" class="w-full border-2 border-red-500 text-red-500 py-8 rounded-2xl font-bold text-2xl">SABOTAGE (FAIL)</button>' : ''}
                         </div>`;
                     }
-                } else ui.innerHTML = `<p class="text-zinc-600 italic">4 AGENTS ARE OPERATING...</p>`;
+                } else ui.innerHTML = `<p class="text-zinc-600 italic animate-pulse text-lg">MISSION IN PROGRESS... STAND BY.</p>`;
+                if(isHost) document.getElementById('admin-notif').innerHTML = `<span class="admin-badge bg-blue-500 text-white">MISSION: ${mVotes}/4</span>`;
                 if(isHost && mVotes >= 4) processMissionResult();
             }
 
             else if(gameState.phase === 'Revealing') {
-                const results = gameState.lastResultCards || [];
-                ui.innerHTML = `<h4 class="text-sm mb-6 cyber-font text-yellow-500">MISSION DISCLOSURE</h4><div class="flex justify-center gap-3">`;
-                results.forEach(res => {
-                    ui.innerHTML += `<div class="mission-card ${res ? 'card-success' : 'card-fail'}">${res ? '✓' : '✗'}</div>`;
-                });
-                ui.innerHTML += `</div><p class="mt-8 text-xs text-zinc-500">Mission Outcome: ${gameState.history[gameState.history.length-1]}</p>`;
-                if(isHost) ui.innerHTML += `<button onclick="nextRound()" class="w-full btn-neon py-3 mt-6">NEXT MISSION</button>`;
+                const cards = gameState.lastCards || [];
+                ui.innerHTML = `<h3 class="text-xl mb-8 text-yellow-500 cyber-font">MISSION DISCLOSURE</h3><div class="flex justify-center gap-4 mb-8">`;
+                cards.forEach(c => ui.innerHTML += `<div class="mission-card ${c ? 'card-success' : 'card-fail'}">${c ? '✓' : '✗'}</div>`);
+                ui.innerHTML += `</div><p class="text-lg font-bold ${gameState.lastOutcome === 'SUCCESS' ? 'text-blue-400' : 'text-red-500'}">OUTCOME: ${gameState.lastOutcome}</p>`;
+                if(isHost) ui.innerHTML += `<button onclick="nextRound()" class="w-full btn-neon py-5 mt-8 font-bold text-xl rounded-2xl">INITIATE NEXT ROUND</button>`;
             }
 
             if(isHost) {
-                const adminGrid = document.getElementById('admin-spy-grid');
-                adminGrid.innerHTML = "";
-                playerKeys.forEach(id => adminGrid.innerHTML += `<div class="text-[8px] p-1 bg-zinc-900 border border-zinc-800 text-zinc-500">${players[id].name}: <span class="text-white">${players[id].role}</span></div>`);
-                document.getElementById('start-btn').disabled = playerKeys.length < 10;
+                const spy = document.getElementById('admin-spy-grid');
+                spy.innerHTML = "";
+                keys.forEach(id => spy.innerHTML += `<div class="text-[9px] p-2 bg-zinc-900 border border-zinc-800 rounded text-zinc-500">${players[id].name}: <span class="text-white">${players[id].role}</span></div>`);
+                document.getElementById('start-btn').disabled = keys.length < 10;
             }
         }
 
-        // --- CORE FUNCTIONS ---
+        // --- HANDLERS ---
         function toggleMember(id) { db.ref(`players/${id}/inMission`).set(!players[id].inMission); }
         function startVote() { db.ref('gameState').update({ phase: 'VotingTeam', votes: {} }); }
         function castVote(val) { db.ref(`gameState/votes/${myName}`).set(val); }
         function castMissionVote(val) { db.ref(`gameState/missionVotes/${myName}`).set(val); }
 
         function processTeamVote() {
-            const votes = Object.values(gameState.votes);
-            const approves = votes.filter(v => v === true).length;
-            if(approves > (votes.length / 2)) db.ref('gameState').update({ phase: 'OnMission', missionVotes: {} });
-            else { alert("VOTE FAILED: PASSING LEADER"); passLeader(); }
+            const v = Object.values(gameState.votes);
+            const ok = v.filter(x => x === true).length;
+            if(ok > (v.length/2)) db.ref('gameState').update({ phase: 'OnMission', missionVotes: {} });
+            else { alert("TEAM REJECTED!"); passLeader(); }
         }
 
         function processMissionResult() {
-            const votes = Object.values(gameState.missionVotes);
-            // สุ่มลำดับไพ่ (Shuffle) ไม่ให้รู้ใครโหวตอะไร
-            const shuffledCards = [...votes].sort(() => Math.random() - 0.5);
-            const failCount = votes.filter(v => v === false).length;
-            const outcome = failCount > 0 ? 'FAIL' : 'SUCCESS';
-            
-            let newHistory = gameState.history || [];
-            newHistory.push(outcome);
-
-            db.ref('gameState').update({ 
-                phase: 'Revealing', 
-                lastResultCards: shuffledCards,
-                history: newHistory,
-                missionVotes: null
-            });
+            const v = Object.values(gameState.missionVotes);
+            const shuffled = [...v].sort(() => Math.random() - 0.5);
+            const failed = v.filter(x => x === false).length;
+            const res = failed > 0 ? 'FAIL' : 'SUCCESS';
+            let hist = gameState.history || [];
+            hist.push(res);
+            db.ref('gameState').update({ phase: 'Revealing', lastCards: shuffled, lastOutcome: res, history: hist, missionVotes: null });
         }
 
         function nextRound() {
@@ -238,36 +238,28 @@
         function passLeader() {
             const keys = Object.keys(players);
             const nextIdx = (gameState.leaderIdx + 1) % keys.length;
-            const updates = {};
-            keys.forEach((id, idx) => {
-                updates[`players/${id}/isLeader`] = (idx === nextIdx);
-                updates[`players/${id}/inMission`] = false;
-            });
-            updates['gameState/leaderIdx'] = nextIdx;
-            updates['gameState/phase'] = 'Selecting';
-            updates['gameState/votes'] = null;
-            db.ref().update(updates);
+            const up = {};
+            keys.forEach((id, idx) => { up[`players/${id}/isLeader`] = (idx === nextIdx); up[`players/${id}/inMission`] = false; });
+            up['gameState/leaderIdx'] = nextIdx;
+            up['gameState/phase'] = 'Selecting';
+            up['gameState/votes'] = null;
+            db.ref().update(up);
         }
 
         function distributeRoles() {
             const keys = Object.keys(players);
-            const count = keys.length;
-            let evilCount = Math.floor(count * 0.4);
+            let evilNum = Math.floor(keys.length * 0.4);
             let pool = ['MERLIN (Good)', 'ASSASSIN (Evil)'];
-            for(let i=0; i < (count - evilCount - 1); i++) pool.push('Servant (Good)');
-            for(let i=0; i < (evilCount - 1); i++) pool.push('Minion (Evil)');
+            for(let i=0; i < (keys.length - evilNum - 1); i++) pool.push('Servant (Good)');
+            for(let i=0; i < (evilNum - 1); i++) pool.push('Minion (Evil)');
             pool = pool.sort(() => Math.random() - 0.5);
-            const updates = {};
-            keys.forEach((id, idx) => {
-                updates[`players/${id}/role`] = pool[idx];
-                updates[`players/${id}/isLeader`] = (idx === 0);
-                updates[`players/${id}/inMission`] = false;
-            });
-            updates['gameState'] = { phase: 'Selecting', leaderIdx: 0, missionNum: 1, history: [], votes: null };
-            db.ref().update(updates);
+            const up = {};
+            keys.forEach((id, idx) => { up[`players/${id}/role`] = pool[idx]; up[`players/${id}/isLeader`] = (idx === 0); up[`players/${id}/inMission`] = false; });
+            up['gameState'] = { phase: 'Selecting', leaderIdx: 0, missionNum: 1, history: [], votes: null };
+            db.ref().update(up);
         }
 
-        function resetGame() { if(confirm("FORMAT DB?")) db.ref('/').set({ timer: 0 }); location.reload(); }
+        function resetGame() { if(confirm("REBOOT SYSTEM?")) db.ref('/').set({ timer: 0 }); location.reload(); }
     </script>
 </body>
 </html>
